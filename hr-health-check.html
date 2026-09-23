@@ -272,6 +272,91 @@ footer.site{border-top:1px solid var(--line);padding:22px 20px 26px;text-align:c
 .footer-bottom-inner{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12.5px}
 .footer-bottom-inner a{color:rgba(255,255,255,.68);text-decoration:none;margin-left:18px}
 .footer-bottom-inner a:hover{color:var(--cyan)}
+
+.hidden-field{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+
+.section-intro{
+  margin:-8px 0 22px;
+  color:var(--ink-soft);
+  font-size:14.5px;
+  max-width:68ch;
+}
+
+.optional{
+  color:var(--ink-soft);
+  font-weight:400;
+  font-size:12px;
+  margin-left:6px;
+}
+
+.field-help{
+  display:block;
+  margin-top:7px;
+  color:var(--ink-soft);
+  font-size:13px;
+  line-height:1.45;
+}
+
+.context-section{
+  padding-top:4px;
+}
+
+.diagnostic-box{
+  padding:20px;
+  border:1px solid var(--line);
+  background:var(--sand);
+  border-radius:6px;
+}
+
+.diagnostic-box .lab{
+  font-size:15px;
+}
+
+.diagnostic-options{
+  margin-top:14px;
+}
+
+.diagnostic-options span{
+  transition:
+    background .15s ease,
+    border-color .15s ease,
+    color .15s ease;
+}
+
+.diagnostic-options label:hover span{
+  background:#fff;
+  border-color:var(--navy);
+}
+
+.diagnostic-options input:checked + span{
+  background:var(--navy);
+  color:#fff;
+  border-color:var(--navy);
+}
+
+@media(max-width:600px){
+  .diagnostic-box{
+    padding:16px;
+  }
+
+  .diagnostic-options{
+    display:grid;
+  }
+
+  .diagnostic-options span{
+    width:100%;
+  }
+}
 </style>
 </head>
 
@@ -319,7 +404,36 @@ footer.site{border-top:1px solid var(--line);padding:22px 20px 26px;text-align:c
 <div class="wrap">
 
   <!-- ==================== FORM ==================== -->
-  <form id="hrForm" novalidate>
+  <form
+  id="hrForm"
+  name="hr-health-check"
+  method="POST"
+  data-netlify="true"
+  netlify-honeypot="bot-field"
+  novalidate
+>
+  <input type="hidden" name="form-name" value="hr-health-check">
+
+  <input type="hidden" name="subject"
+         value="New HR Health Check Submission — Team Mates">
+
+  <input type="hidden" name="q1" id="netlify-q1">
+  <input type="hidden" name="q2" id="netlify-q2">
+  <input type="hidden" name="q3" id="netlify-q3">
+  <input type="hidden" name="q4" id="netlify-q4">
+  <input type="hidden" name="q5" id="netlify-q5">
+  <input type="hidden" name="q6" id="netlify-q6">
+  <input type="hidden" name="q7" id="netlify-q7">
+  <input type="hidden" name="q8" id="netlify-q8">
+  <input type="hidden" name="q9" id="netlify-q9">
+  <input type="hidden" name="q10" id="netlify-q10">
+
+  <p class="hidden-field" aria-hidden="true">
+    <label>
+      Don't fill this out:
+      <input name="bot-field" tabindex="-1" autocomplete="off">
+    </label>
+  </p>
     <section>
       <div class="section-head"><h2>Your organisation</h2></div>
       <div class="fields two">
@@ -362,22 +476,79 @@ footer.site{border-top:1px solid var(--line);padding:22px 20px 26px;text-align:c
       <ol class="questions" id="questions"></ol>
     </section>
 
-    <section>
-      <div class="section-head"><h2>Tell us a little more</h2></div>
-      <div class="fields">
-        <label class="field">
-          <span class="lab">What is your biggest people-related challenge right now?</span>
-          <textarea name="challenge" id="challenge"></textarea>
+    <section class="context-section">
+  <div class="section-head">
+    <h2>A little context about your organisation</h2>
+  </div>
+
+  <p class="section-intro">
+    Your answers give us a useful snapshot. This optional context helps us
+    understand what matters most to your organisation.
+  </p>
+
+  <div class="fields">
+
+    <label class="field">
+      <span class="lab">
+        What is your biggest people-related challenge right now?
+        <span class="optional">Optional</span>
+      </span>
+
+      <textarea
+        name="challenge"
+        id="challenge"
+        rows="5"
+        maxlength="1000"
+        placeholder="For example: hiring, employee performance, retention, payroll, policies, organisational structure..."
+      ></textarea>
+
+      <span class="field-help">
+        A short description is enough.
+      </span>
+    </label>
+
+    <div class="field diagnostic-box">
+      <span class="lab">
+        Would you like to discuss your results with a Team Mates HR advisor?
+        <span class="req">*</span>
+      </span>
+
+      <p class="field-help">
+        We can offer a complimentary HR diagnostic discussion to help you
+        understand your results and identify practical next steps.
+      </p>
+
+      <div class="yesno diagnostic-options">
+
+        <label>
+          <input
+            type="radio"
+            name="diagnostic"
+            value="Yes, I would like a complimentary diagnostic discussion"
+            required
+          >
+          <span>
+            Yes, I'd like to discuss my results
+          </span>
         </label>
-        <div class="field">
-          <span class="lab">Would you like a complimentary HR diagnostic discussion?</span>
-          <div class="yesno">
-            <label><input type="radio" name="diagnostic" value="Yes, please" checked><span>Yes, please</span></label>
-            <label><input type="radio" name="diagnostic" value="Not at present"><span>Not at present</span></label>
-          </div>
-        </div>
+
+        <label>
+          <input
+            type="radio"
+            name="diagnostic"
+            value="Not at present"
+            required
+          >
+          <span>
+            Not at present
+          </span>
+        </label>
+
       </div>
-    </section>
+    </div>
+
+  </div>
+</section>
 
     <p class="disclaimer">This is an indicative self-check, not a verified assessment. Address any serious concern regardless of your total score.</p>
     <div class="status" id="status" role="status"></div>
@@ -520,11 +691,7 @@ document.getElementById('navToggle').addEventListener('click', function(){
 /* ==================================================================
    CONFIG — edit these three lines only
    ================================================================== */
-var CONFIG = {
-  ENDPOINT:   "",                            // e.g. "https://formsubmit.co/ajax/info@teammates.com.pk"
-  ACCESS_KEY: "",                            // Web3Forms only
-  EMAIL_TO:   "info@teammates.com.pk"        // shown if sending fails
-};
+
 /* ================================================================== */
 
 var QUESTIONS = [
@@ -646,6 +813,15 @@ function getCss(v){ return getComputedStyle(document.documentElement).getPropert
 
 function refresh() {
   var r = readAnswers();
+  r.detail.forEach(function(d){
+  var field = document.getElementById("netlify-q" + d.n);
+
+  if(field){
+    field.value = d.score === null
+      ? ""
+      : QUESTIONS[d.n - 1] + " — " + d.label;
+  }
+});
   barScore.textContent = r.total;
   barAnswered.textContent = r.answered;
   barBand.textContent = r.answered === QUESTIONS.length ? bandFor(r.total).name
@@ -685,6 +861,23 @@ function validate(r) {
     document.getElementById(problems[0]).focus();
     return false;
   }
+  var diagnosticChoice =
+  document.querySelector('input[name="diagnostic"]:checked');
+
+if(!diagnosticChoice){
+  showStatus(
+    status,
+    "Please select whether you would like to discuss your results with a Team Mates HR advisor.",
+    false
+  );
+
+  document.querySelector(".diagnostic-options").scrollIntoView({
+    block:"center",
+    behavior:"smooth"
+  });
+
+  return false;
+}
   if (missing.length) {
     showStatus(status, "Please answer all ten questions — " + missing.length + " still to go.", false);
     document.getElementById("q" + missing[0].n).scrollIntoView({ block:"center", behavior:"smooth" });
@@ -805,79 +998,138 @@ function renderDashboard(r) {
   });
 }
 
-/* ---------- Submit ---------- */
-function buildBody(r) {
-  var band = bandFor(r.total);
-  var lines = r.detail.map(function (d) {
-    return d.n + ". " + QUESTIONS[d.n - 1] + "\n     " + d.label + " (" + d.score + ")";
-  }).join("\n");
-  var dom = DOMAINS.map(function (dm) {
-    var got = 0, max = dm.qs.length * 2;
-    dm.qs.forEach(function (n) { got += r.detail[n - 1].score; });
-    return "  " + dm.name + ": " + got + "/" + max;
-  }).join("\n");
+/* ---------- Submit to Netlify Forms ---------- */
 
-  return "HR HEALTH CHECK — NEW SUBMISSION\n==================================\n\n" +
-    "Company:        " + document.getElementById("company").value.trim() + "\n" +
-    "Nature:         " + document.getElementById("nature").value.trim() + "\n" +
-    "Email:          " + document.getElementById("email").value.trim() + "\n" +
-    "Contact person: " + (document.getElementById("contact").value.trim() || "—") + "\n" +
-    "Phone:          " + (document.getElementById("phone").value.trim() || "—") + "\n" +
-    "Employees:      " + (document.getElementById("headcount").value || "—") + "\n\n" +
-    "TOTAL SCORE:    " + r.total + " / 20  (" + Math.round(r.total / 20 * 100) + "%)\n" +
-    "BAND:           " + band.name + "\n\n" +
-    "BY AREA\n-------\n" + dom + "\n\n" +
-    "RESPONSES\n---------\n" + lines + "\n\n" +
-    "Biggest people challenge:\n" +
-    (document.getElementById("challenge").value.trim() || "—") + "\n\n" +
-    "Wants a diagnostic discussion: " +
-    document.querySelector('input[name="diagnostic"]:checked').value + "\n\n" +
-    "Submitted: " + new Date().toLocaleString() + "\n";
-}
-
-form.addEventListener("submit", function (e) {
+form.addEventListener("submit", async function(e) {
   e.preventDefault();
+
   var r = refresh();
+
   if (!validate(r)) return;
 
-  status.className = "status";
-  renderDashboard(r);
+  var submitBtn = document.getElementById("submitBtn");
 
-  if (!CONFIG.ENDPOINT) {
-    console.warn("HR Health Check: CONFIG.ENDPOINT is empty — nothing was emailed.");
-    return;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Preparing your results...";
+
+  status.className = "status";
+
+  /*
+   * Update hidden Netlify fields one final time
+   * before submission.
+   */
+  r.detail.forEach(function(d){
+    var field = document.getElementById("netlify-q" + d.n);
+
+    if(field){
+      field.value =
+        QUESTIONS[d.n - 1] +
+        " — " +
+        d.label +
+        " (" +
+        d.score +
+        "/2)";
+    }
+  });
+
+  var diagnostic = document.querySelector(
+    'input[name="diagnostic"]:checked'
+  );
+
+  if(diagnostic){
+    /*
+     * Netlify already sees this field because it exists
+     * directly in the HTML.
+     */
   }
 
-  var data = {
-    subject: "HR Health Check — " + document.getElementById("company").value.trim() +
-             " (" + r.total + "/20)",
-    message: buildBody(r),
-    company: document.getElementById("company").value.trim(),
-    nature_of_business: document.getElementById("nature").value.trim(),
-    email: document.getElementById("email").value.trim(),
-    contact_person: document.getElementById("contact").value.trim(),
-    phone: document.getElementById("phone").value.trim(),
-    employees: document.getElementById("headcount").value,
-    total_score: r.total + "/20",
-    band: bandFor(r.total).name,
-    challenge: document.getElementById("challenge").value.trim(),
-    diagnostic: document.querySelector('input[name="diagnostic"]:checked').value,
-    _replyto: document.getElementById("email").value.trim()
-  };
-  if (CONFIG.ACCESS_KEY) data.access_key = CONFIG.ACCESS_KEY;
+  var formData = new FormData(form);
 
-  fetch(CONFIG.ENDPOINT, {
-    method: "POST",
-    headers: { "Content-Type":"application/json", "Accept":"application/json" },
-    body: JSON.stringify(data)
-  })
-  .then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); })
-  .then(function () {
-    showStatus(dashStatus, "A copy of these results has been sent to our team. We'll be in touch shortly.", true);
-  })
-  .catch(function () {
-    showStatus(dashStatus, "Your results are shown above, but we couldn't send a copy to our team. Please forward them to " + CONFIG.EMAIL_TO + ".", false);
-  });
+  /*
+   * Add useful calculated information to the submission.
+   */
+  formData.append(
+    "total_score",
+    r.total + " / 20"
+  );
+
+  formData.append(
+    "score_percentage",
+    Math.round(r.total / 20 * 100) + "%"
+  );
+
+  formData.append(
+    "score_band",
+    bandFor(r.total).name
+  );
+
+    formData.append(
+    "submitted_at",
+    new Date().toLocaleString()
+  );
+
+  formData.append(
+    "domain_summary",
+    DOMAINS.map(function(dm){
+      var got = 0;
+      var max = dm.qs.length * 2;
+
+      dm.qs.forEach(function(n){
+        got += r.detail[n - 1].score;
+      });
+
+      return dm.name + ": " + got + "/" + max;
+    }).join(" | ")
+  );
+
+  try {
+
+    var response = await fetch("/", {
+      method: "POST",
+      headers: {
+        "Content-Type":
+          "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams(formData).toString()
+    });
+
+    if(!response.ok){
+      throw new Error("Submission failed");
+    }
+
+    /*
+     * Show the dashboard immediately.
+     */
+    renderDashboard(r);
+
+    showStatus(
+      dashStatus,
+      "Your HR Health Check has been submitted successfully. Your results are shown below.",
+      true
+    );
+
+  } catch(error) {
+
+    console.error(error);
+
+    /*
+     * Even if submission fails, don't hide the user's
+     * results. They can still see their dashboard.
+     */
+    renderDashboard(r);
+
+    showStatus(
+      dashStatus,
+      "Your results are ready, but we couldn't submit a copy to our team. Please email us directly at info@teammates.com.pk.",
+      false
+    );
+
+  } finally {
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "See my results";
+
+  }
 });
 
 /* ---------- Start again ---------- */
