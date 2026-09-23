@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HR Health Check — Team Mates</title>
+<meta name="description" content="A free 10-question self-check on how well your people practices support your business.">
+
+<!--
+====================================================================
+  TEAM MATES — HR HEALTH CHECK  (with results dashboard)
+  Upload this single file, e.g.
+      https://teammates.com.pk/hr-health-check.html
+
+  WHERE THE RESULTS GO — edit the CONFIG block in the script below.
+
+  (a) FormSubmit — no signup. Set
+      ENDPOINT: "https://formsubmit.co/ajax/info@teammates.com.pk"
+      The first submission sends you a confirmation link. Click it
+      once and the form is live from then on.
+
+  (b) Web3Forms — free key from web3forms.com. Set
+      ENDPOINT:   "https://api.web3forms.com/submit"
+      ACCESS_KEY: "your-key-here"
+
+  The visitor's own mail app is never opened. If ENDPOINT is left
+  empty the dashboard still appears, but nothing is emailed — so set
+  it before going live.
+
+  EMBEDDING
+      <iframe src="https://teammates.com.pk/hr-health-check.html"
+              style="width:100%;height:1000px;border:0"></iframe>
+====================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#131A24;
+  --ink-soft:#59667A;
+  --paper:#FFFFFF;
+  --card:#FFFFFF;
+  --sand:#F3F6FB;
+  --line:#E1E7F0;
+  --brass:#F68121;
+  --green:#1E8F5E;
+  --amber:#C98A1F;
+  --rust:#B23B3B;
+  --focus:#01C0F4;
+  --navy:#054DA2;
+  --navy-ink:#041B40;
+  --orange:#F68121;
+  --orange-deep:#D96A0F;
+  --cyan:#01C0F4;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:16px;line-height:1.6;
+}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px 140px}
+
+header{border-bottom:1px solid var(--line);background:var(--card)}
+.header-inner{max-width:820px;margin:0 auto;padding:40px 20px 34px}
+.brand{font-size:13px;font-weight:600;letter-spacing:.14em;color:var(--brass);margin:0 0 18px}
+h1{font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(30px,5.4vw,44px);
+   line-height:1.12;letter-spacing:-.015em;margin:0 0 14px}
+.lede{margin:0;max-width:56ch;color:var(--ink-soft);font-size:17px}
+
+section{margin-top:44px}
+.section-head{display:flex;align-items:baseline;gap:12px;padding-bottom:12px;
+  border-bottom:2px solid var(--ink);margin-bottom:24px}
+.section-head h2{font-family:Fraunces,Georgia,serif;font-weight:500;font-size:23px;
+  margin:0;letter-spacing:-.01em}
+.section-head .note{margin-left:auto;font-size:13px;color:var(--ink-soft);text-align:right}
+
+.fields{display:grid;gap:18px}
+@media(min-width:620px){ .fields.two{grid-template-columns:1fr 1fr} }
+label.field{display:block}
+.lab{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.req{color:var(--rust);font-weight:400}
+input[type=text],input[type=email],input[type=tel],textarea,select{
+  width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--card);
+  border:1px solid var(--line);border-radius:3px;padding:11px 13px}
+textarea{min-height:104px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--focus);outline-offset:1px;border-color:var(--focus)}
+input.err,textarea.err{border-color:var(--rust);background:#FDF5F3}
+
+ol.questions{list-style:none;margin:0;padding:0;counter-reset:q}
+ol.questions li{counter-increment:q;border-bottom:1px solid var(--line);padding:20px 0;display:grid;gap:14px}
+@media(min-width:720px){ ol.questions li{grid-template-columns:1fr 300px;align-items:center;gap:28px} }
+.q-text{display:flex;gap:12px;font-size:16.5px;line-height:1.45}
+.q-text::before{content:counter(q);font-family:Fraunces,Georgia,serif;font-size:15px;
+  color:var(--brass);min-width:20px;padding-top:2px}
+ol.questions li.missing .q-text{color:var(--rust)}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);
+  border-radius:3px;overflow:hidden;background:var(--card)}
+.opts label{margin:0;cursor:pointer}
+.opts input{position:absolute;opacity:0;width:0;height:0}
+.opts span{display:block;text-align:center;padding:9px 4px;font-size:13.5px;font-weight:500;
+  color:var(--ink-soft);border-left:1px solid var(--line);transition:background .12s ease,color .12s ease}
+.opts label:first-child span{border-left:0}
+.opts label:hover span{background:var(--sand)}
+.opts input:checked + span{background:var(--ink);color:#fff}
+.opts input:focus-visible + span{outline:2px solid var(--focus);outline-offset:-2px}
+ol.questions li.missing .opts{border-color:var(--rust)}
+
+.yesno{display:flex;gap:10px;flex-wrap:wrap}
+.yesno label{margin:0;cursor:pointer}
+.yesno input{position:absolute;opacity:0;width:0;height:0}
+.yesno span{display:block;padding:9px 18px;border:1px solid var(--line);border-radius:3px;
+  background:var(--card);font-size:14.5px}
+.yesno input:checked + span{background:var(--ink);color:#fff;border-color:var(--ink)}
+.yesno input:focus-visible + span{outline:2px solid var(--focus);outline-offset:1px}
+
+/* ---------- Sticky bar ---------- */
+.scorebar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;z-index:40}
+.scorebar-inner{max-width:820px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:16px}
+.score-num{font-family:Fraunces,Georgia,serif;font-size:28px;line-height:1;font-weight:500}
+.score-num small{font-size:15px;opacity:.65}
+.score-meta{font-size:13px;opacity:.8;line-height:1.35}
+.scorebar .btn{margin-left:auto}
+.btn{font:inherit;font-size:15px;font-weight:600;padding:11px 22px;border-radius:3px;
+  border:1px solid transparent;cursor:pointer}
+.btn-primary{background:var(--brass);color:#fff}
+.btn-primary:hover{background:var(--orange-deep)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+.btn-ghost:hover{background:var(--sand)}
+
+.disclaimer{margin-top:26px;font-size:13.5px;color:var(--ink-soft);
+  border-top:1px solid var(--line);padding-top:16px}
+.status{margin-top:18px;padding:13px 16px;border-radius:3px;font-size:14.5px;display:none}
+.status.show{display:block}
+.status.ok{background:#EAF3ED;color:var(--green);border:1px solid #BEDCC9}
+.status.bad{background:#FDF0EC;color:var(--rust);border:1px solid #EFCCC2}
+
+/* ==================== DASHBOARD ==================== */
+#dashboard{display:none}
+#dashboard.show{display:block}
+.dash-top{display:grid;gap:26px;align-items:center}
+@media(min-width:660px){ .dash-top{grid-template-columns:240px 1fr} }
+.gauge{display:block;margin:0 auto}
+.gauge .track{fill:none;stroke:var(--sand);stroke-width:16}
+.gauge .arc{fill:none;stroke-width:16;stroke-linecap:round;
+  transition:stroke-dashoffset 1.1s cubic-bezier(.22,1,.36,1)}
+.gauge .num{font-family:Fraunces,Georgia,serif;font-size:52px;font-weight:500;
+  fill:var(--ink);text-anchor:middle}
+.gauge .den{font-family:Inter,sans-serif;font-size:14px;fill:var(--ink-soft);text-anchor:middle}
+
+.verdict h3{font-family:Fraunces,Georgia,serif;font-weight:500;font-size:27px;margin:0 0 8px;
+  letter-spacing:-.01em}
+.verdict .bandtag{display:inline-block;font-size:12.5px;font-weight:600;letter-spacing:.06em;
+  padding:4px 11px;border-radius:2px;margin-bottom:12px}
+.bandtag.high{background:#EAF3ED;color:var(--green)}
+.bandtag.mid{background:#FAF2E2;color:var(--amber)}
+.bandtag.low{background:#FBEDE9;color:var(--rust)}
+.verdict p{margin:0;color:var(--ink-soft)}
+
+.meta-strip{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);
+  margin-top:30px;grid-template-columns:repeat(2,1fr)}
+@media(min-width:660px){ .meta-strip{grid-template-columns:repeat(4,1fr)} }
+.meta-strip div{background:var(--card);padding:13px 15px}
+.meta-strip dt{font-size:12px;color:var(--ink-soft);margin:0 0 3px}
+.meta-strip dd{margin:0;font-size:15px;font-weight:500;word-break:break-word}
+
+/* domain bars */
+.domains{display:grid;gap:17px}
+.domain-row{display:grid;gap:7px}
+.domain-line{display:flex;align-items:baseline;gap:10px;font-size:14.5px}
+.domain-line .name{font-weight:500}
+.domain-line .val{margin-left:auto;font-size:13px;color:var(--ink-soft);white-space:nowrap}
+.bar{height:11px;background:var(--sand);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:2px;
+  transition:width .9s cubic-bezier(.22,1,.36,1)}
+.fill-high{background:var(--green)}
+.fill-mid{background:var(--amber)}
+.fill-low{background:var(--rust)}
+
+/* question grid */
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line)}
+.qcell{background:var(--card);padding:11px 13px;display:flex;gap:10px;align-items:flex-start}
+.dot{width:10px;height:10px;border-radius:50%;flex:0 0 10px;margin-top:6px}
+.dot.s2{background:var(--green)}
+.dot.s1{background:var(--amber)}
+.dot.s0{background:var(--rust)}
+.qcell .t{font-size:13.5px;line-height:1.35}
+.qcell .t b{display:block;font-weight:600;font-size:12px;color:var(--ink-soft);margin-bottom:2px}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--ink-soft);margin-top:14px}
+.legend span{display:flex;align-items:center;gap:7px}
+
+.actions-list{list-style:none;margin:0;padding:0;counter-reset:a}
+.actions-list li{counter-increment:a;display:flex;gap:13px;padding:13px 0;
+  border-bottom:1px solid var(--line);font-size:15.5px;line-height:1.45}
+.actions-list li::before{content:counter(a);font-family:Fraunces,Georgia,serif;
+  color:var(--brass);min-width:18px}
+.all-clear{background:#EAF3ED;border:1px solid #BEDCC9;color:var(--green);padding:16px 18px;font-size:15px}
+
+.dash-foot{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px}
+
+@media print{
+  .topbar,.site-nav,.pagehead,.scorebar,.dash-foot,.footer-full{display:none!important}
+  body{background:#fff}
+  .wrap{padding-bottom:0}
+  section{break-inside:avoid}
+}
+footer.site{border-top:1px solid var(--line);padding:22px 20px 26px;text-align:center;
+  font-size:13px;color:var(--ink-soft)}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+
+/* ===== Site chrome (added to match teammates.com.pk redesign) ===== */
+.topbar{background:var(--navy-ink);color:rgba(255,255,255,.75);font-size:13px}
+.topbar-inner{max-width:1180px;margin:0 auto;padding:9px 20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.topbar-inner a{color:rgba(255,255,255,.75);text-decoration:none}
+.topbar-inner a:hover{color:var(--cyan)}
+.topbar-links{display:flex;gap:20px}
+
+.site-nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-inner{max-width:1180px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.site-brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.site-brand img{height:32px;width:auto;display:block}
+.site-brand span{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:18px;color:var(--navy-ink)}
+.nav-links{display:flex;align-items:center;gap:30px}
+.nav-links a{font-family:Inter,sans-serif;font-size:14.5px;font-weight:500;color:var(--ink);text-decoration:none;padding:4px 0;border-bottom:2px solid transparent}
+.nav-links a:hover,.nav-links a.active{border-bottom-color:var(--orange)}
+.nav-cta{display:flex;align-items:center;gap:18px}
+.nav-toggle{display:none;background:none;border:none;padding:6px;cursor:pointer}
+.nav-toggle span{display:block;width:22px;height:2px;background:var(--navy-ink);margin:5px 0}
+@media(max-width:900px){
+  .nav-links{position:fixed;inset:60px 0 0 0;background:#fff;flex-direction:column;align-items:flex-start;gap:0;padding:10px 20px 24px;
+    transform:translateY(-8px);opacity:0;pointer-events:none;transition:.2s ease;border-top:1px solid var(--line)}
+  .nav-links.open{transform:translateY(0);opacity:1;pointer-events:auto}
+  .nav-links a{width:100%;padding:14px 0;border-bottom:1px solid var(--line)}
+  .nav-toggle{display:block}
+  .nav-cta .btn{display:none}
+}
+
+.pagehead{background:var(--navy-ink);position:relative;overflow:hidden;padding:56px 20px 52px}
+.pagehead-inner{max-width:820px;margin:0 auto;padding-right:240px;position:relative;z-index:1}
+.pagehead p.brand{color:var(--cyan);margin-bottom:14px}
+.pagehead h1{color:#fff;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(30px,5.4vw,44px);line-height:1.12;letter-spacing:-.015em;margin:0 0 14px}
+.pagehead p.lede{color:rgba(255,255,255,.72)}
+.pagehead-mark{position:absolute;right:20px;top:50%;transform:translateY(-50%);width:220px;height:220px;opacity:.9}
+@media(max-width:820px){.pagehead-inner{padding-right:200px}.pagehead-mark{right:16px;width:180px;height:180px}}
+@media(max-width:600px){.pagehead-inner{padding-right:0}.pagehead-mark{display:none}}
+
+.btn.btn-outline{background:transparent;border:1px solid var(--navy);color:var(--navy)}
+.btn.btn-outline:hover{background:var(--navy);color:#fff}
+
+.footer-full{background:var(--navy-ink);color:rgba(255,255,255,.68);padding-top:64px;font-family:Inter,sans-serif}
+.footer-full .footer-inner{max-width:1180px;margin:0 auto;padding:0 20px 44px;display:grid;grid-template-columns:1.3fr 1fr 1fr 1.1fr;gap:44px}
+.footer-full .footer-brand{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.footer-full .footer-brand img{height:28px}
+.footer-full .footer-brand span{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:17px;color:#fff}
+.footer-full p{font-size:13.5px;line-height:1.7;max-width:300px;margin:0}
+.footer-full h4{color:#fff;font-size:13px;font-weight:600;letter-spacing:.02em;margin:0 0 16px}
+.footer-full ul{list-style:none;margin:0;padding:0}
+.footer-full ul li{margin-bottom:11px}
+.footer-full ul a{font-size:13.5px;color:rgba(255,255,255,.68);text-decoration:none}
+.footer-full ul a:hover{color:var(--cyan)}
+.footer-social{display:flex;gap:10px;margin-top:18px}
+.footer-social a{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;transition:.15s ease}
+.footer-social a:hover{background:var(--cyan);border-color:var(--cyan)}
+.footer-social svg{width:14px;height:14px}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px;margin-top:8px}
+.footer-bottom-inner{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12.5px}
+.footer-bottom-inner a{color:rgba(255,255,255,.68);text-decoration:none;margin-left:18px}
+.footer-bottom-inner a:hover{color:var(--cyan)}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-links">
+      <a href="mailto:info@teammates.com.pk">info@teammates.com.pk</a>
+      <a href="tel:+923004186061">+92 300 418 6061</a>
+    </div>
+    <div class="topbar-links"><span>14, Royal Palm Golf Ave, Lahore</span></div>
+  </div>
+</div>
+
+<header class="site-nav">
+  <div class="nav-inner">
+    <a href="index.html" class="site-brand"><img src="assets/logo.png" alt="Team Mates logo"><span>Team Mates</span></a>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="services.html">Services</a>
+      <a href="hr-health-check.html" class="active">HR Health Check</a>
+      <a href="contact.html">Contact Us</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="contact.html" class="btn btn-primary">Book a Consultation</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<section class="pagehead">
+  <div class="pagehead-inner">
+    <p class="brand">Free diagnostic</p>
+    <h1>HR Health Check</h1>
+    <p class="lede">How well are your people practices supporting your business? Ten questions, about three minutes. Answer based on actual practice, not intention.</p>
+  </div>
+  <svg class="pagehead-mark" viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <polygon points="170,240 210,275 250,240 250,340 210,375 170,340" fill="#01C0F4" opacity=".9"/>
+    <polygon points="60,60 360,60 210,200" fill="#F68121" opacity=".55"/>
+  </svg>
+</section>
+
+<div class="wrap">
+
+  <!-- ==================== FORM ==================== -->
+  <form id="hrForm" novalidate>
+    <section>
+      <div class="section-head"><h2>Your organisation</h2></div>
+      <div class="fields two">
+        <label class="field">
+          <span class="lab">Company name <span class="req">*</span></span>
+          <input type="text" name="company" id="company" autocomplete="organization" required>
+        </label>
+        <label class="field">
+          <span class="lab">Nature of business <span class="req">*</span></span>
+          <input type="text" name="nature" id="nature" placeholder="e.g. textile manufacturing, IT services" required>
+        </label>
+        <label class="field">
+          <span class="lab">Email address <span class="req">*</span></span>
+          <input type="email" name="email" id="email" autocomplete="email" required>
+        </label>
+        <label class="field">
+          <span class="lab">Contact person</span>
+          <input type="text" name="contact" id="contact" autocomplete="name">
+        </label>
+        <label class="field">
+          <span class="lab">Phone</span>
+          <input type="tel" name="phone" id="phone" autocomplete="tel">
+        </label>
+        <label class="field">
+          <span class="lab">Number of employees</span>
+          <select name="headcount" id="headcount">
+            <option value="">Select</option>
+            <option>1–10</option><option>11–50</option><option>51–200</option>
+            <option>201–500</option><option>500+</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>The ten questions</h2>
+        <span class="note">Yes = 2 &nbsp;·&nbsp; Partly = 1 &nbsp;·&nbsp; No = 0</span>
+      </div>
+      <ol class="questions" id="questions"></ol>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Tell us a little more</h2></div>
+      <div class="fields">
+        <label class="field">
+          <span class="lab">What is your biggest people-related challenge right now?</span>
+          <textarea name="challenge" id="challenge"></textarea>
+        </label>
+        <div class="field">
+          <span class="lab">Would you like a complimentary HR diagnostic discussion?</span>
+          <div class="yesno">
+            <label><input type="radio" name="diagnostic" value="Yes, please" checked><span>Yes, please</span></label>
+            <label><input type="radio" name="diagnostic" value="Not at present"><span>Not at present</span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <p class="disclaimer">This is an indicative self-check, not a verified assessment. Address any serious concern regardless of your total score.</p>
+    <div class="status" id="status" role="status"></div>
+  </form>
+
+  <!-- ==================== DASHBOARD ==================== -->
+  <div id="dashboard" aria-live="polite">
+
+    <section style="margin-top:38px">
+      <div class="section-head">
+        <h2>Your HR Health Check results</h2>
+        <span class="note" id="dashDate"></span>
+      </div>
+
+      <div class="dash-top">
+        <svg class="gauge" id="gauge" width="210" height="210" viewBox="0 0 210 210" role="img" aria-labelledby="gaugeLabel">
+          <title id="gaugeLabel">Overall score</title>
+          <circle class="track" cx="105" cy="105" r="88"></circle>
+          <circle class="arc" id="gaugeArc" cx="105" cy="105" r="88"
+                  transform="rotate(-90 105 105)"></circle>
+          <text class="num" x="105" y="108" id="gaugeNum">0</text>
+          <text class="den" x="105" y="130">out of 20</text>
+        </svg>
+
+        <div class="verdict">
+          <span class="bandtag" id="bandTag"></span>
+          <h3 id="verdictTitle"></h3>
+          <p id="verdictText"></p>
+        </div>
+      </div>
+
+      <dl class="meta-strip" id="metaStrip"></dl>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Where you stand, area by area</h2>
+      </div>
+      <div class="domains" id="domains"></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Question by question</h2></div>
+      <div class="qgrid" id="qgrid"></div>
+      <div class="legend">
+        <span><i class="dot s2"></i> Yes — in place</span>
+        <span><i class="dot s1"></i> Partly — needs work</span>
+        <span><i class="dot s0"></i> No or unsure — gap</span>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Where to start</h2>
+        <span class="note">Your lowest-scoring answers first</span>
+      </div>
+      <div id="actionsWrap"></div>
+    </section>
+
+    <p class="disclaimer">This is an indicative self-check, not a verified assessment. Address any serious concern regardless of your total score.</p>
+    <div class="status" id="dashStatus" role="status"></div>
+
+    <div class="dash-foot">
+      <button type="button" class="btn btn-primary" onclick="window.print()">Save or print this report</button>
+      <button type="button" class="btn btn-ghost" id="restartBtn">Start again</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="scorebar" id="scorebar">
+  <div class="scorebar-inner">
+    <div><div class="score-num"><span id="barScore">0</span><small> / 20</small></div></div>
+    <div class="score-meta"><span id="barAnswered">0</span> of 10 answered<br><span id="barBand">Your score updates as you answer</span></div>
+    <button type="submit" form="hrForm" class="btn btn-primary" id="submitBtn">See my results</button>
+  </div>
+</div>
+
+<footer class="footer-full">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand"><img src="assets/logo.png" alt="Team Mates logo"><span>Team Mates</span></div>
+      <p>Team Mates provides HR consultancy and advisory services to help Pakistani organizations build structured, compliant and profitable management systems.</p>
+      <div class="footer-social">
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 9h3V6h-3c-1.66 0-3 1.34-3 3v2H9v3h2v6h3v-6h3l1-3h-4v-2c0-.55.45-1 1-1z"/></svg></a>
+        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6.5 8.5v9M6.5 5.5v.01M11 17.5v-5.2c0-1.8 1.2-3.3 3-3.3s3 1.4 3 3.3v5.2M11 12.3v-3.8"/></svg></a>
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.2"/><circle cx="16.4" cy="7.6" r=".6" fill="currentColor" stroke="none"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M10.5 9.5l4 2.5-4 2.5z" fill="currentColor" stroke="none"/></svg></a>
+      </div>
+    </div>
+    <div>
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="hr-health-check.html">HR Health Check</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Services</h4>
+      <ul>
+        <li><a href="services.html#strategic-hr">Strategic HR & OD</a></li>
+        <li><a href="services.html#talent">Talent & Performance</a></li>
+        <li><a href="services.html#operations">HR Operations</a></li>
+        <li><a href="services.html#financial">Financial Consultancy</a></li>
+        <li><a href="services.html#training">Training & Coaching</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:info@teammates.com.pk">info@teammates.com.pk</a></li>
+        <li><a href="tel:+923004186061">+92 300 418 6061</a></li>
+        <li><span style="font-size:13.5px;">14, Royal Palm Golf Ave, Lahore</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-bottom-inner">
+      <span>Copyright 2026 Team Mates. All rights reserved.</span>
+      <div>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Conditions</a>
+        <a href="#">Refund Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('navToggle').addEventListener('click', function(){
+  var links = document.getElementById('navLinks');
+  var open = links.classList.toggle('open');
+  this.setAttribute('aria-expanded', open);
+});
+</script>
+
+<script>
+/* ==================================================================
+   CONFIG — edit these three lines only
+   ================================================================== */
+var CONFIG = {
+  ENDPOINT:   "",                            // e.g. "https://formsubmit.co/ajax/info@teammates.com.pk"
+  ACCESS_KEY: "",                            // Web3Forms only
+  EMAIL_TO:   "info@teammates.com.pk"        // shown if sending fails
+};
+/* ================================================================== */
+
+var QUESTIONS = [
+  "Is someone clearly responsible for managing HR matters?",
+  "Do employees understand their roles and reporting lines?",
+  "Do you plan staffing needs before recruiting?",
+  "Do you use clear criteria when selecting candidates?",
+  "Do new employees receive written employment terms and proper orientation?",
+  "Do employees have clear performance targets and receive regular feedback?",
+  "Do you identify skill gaps and provide relevant training?",
+  "Are salaries market competitive, paid accurately and on time?",
+  "Are employee records, attendance and leave information kept up to date?",
+  "Are workplace policies clear, with a trusted way for employees to raise concerns?"
+];
+
+var SHORT = [
+  "HR ownership","Roles & reporting","Workforce planning","Selection criteria",
+  "Contracts & onboarding","Performance & feedback","Training","Pay",
+  "Records & leave","Policies & voice"
+];
+
+var DOMAINS = [
+  { name:"Structure and accountability", qs:[1,2] },
+  { name:"Hiring and onboarding",        qs:[3,4,5] },
+  { name:"Performance and development",  qs:[6,7] },
+  { name:"Pay and records",              qs:[8,9] },
+  { name:"Policy and employee voice",    qs:[10] }
+];
+
+var ACTIONS = [
+  "Name one person who owns HR, and put it in writing.",
+  "Draw a simple organogram and share it so everyone knows who reports to whom.",
+  "Forecast headcount and budget before you open a vacancy.",
+  "Agree the selection criteria for a role before you start interviewing.",
+  "Issue written employment terms on day one and run a structured induction.",
+  "Set a handful of measurable targets per role and hold regular check-ins.",
+  "Map skills against role needs and build a simple annual training plan.",
+  "Benchmark salaries against the market and audit your payroll accuracy.",
+  "Move employee records, attendance and leave onto one maintained system.",
+  "Document core policies and give employees a trusted channel to raise concerns."
+];
+
+var OPTIONS = [
+  { label:"Yes",         value:2 },
+  { label:"Partly",      value:1 },
+  { label:"No / Unsure", value:0 }
+];
+
+/* ---------- Build questions ---------- */
+var list = document.getElementById("questions");
+QUESTIONS.forEach(function (text, i) {
+  var n = i + 1;
+  var li = document.createElement("li");
+  li.id = "q" + n;
+
+  var q = document.createElement("div");
+  q.className = "q-text";
+  q.appendChild(document.createTextNode(text));
+
+  var opts = document.createElement("div");
+  opts.className = "opts";
+  opts.setAttribute("role", "radiogroup");
+  opts.setAttribute("aria-label", "Question " + n);
+
+  OPTIONS.forEach(function (o) {
+    var lab = document.createElement("label");
+    var inp = document.createElement("input");
+    inp.type = "radio";
+    inp.name = "q" + n;          // same name = one answer only
+    inp.value = o.value;
+    var sp = document.createElement("span");
+    sp.textContent = o.label;
+    lab.appendChild(inp); lab.appendChild(sp);
+    opts.appendChild(lab);
+  });
+
+  li.appendChild(q); li.appendChild(opts);
+  list.appendChild(li);
+});
+
+/* ---------- Scoring ---------- */
+var barScore = document.getElementById("barScore"),
+    barAnswered = document.getElementById("barAnswered"),
+    barBand = document.getElementById("barBand");
+
+function readAnswers() {
+  var total = 0, answered = 0, detail = [];
+  for (var n = 1; n <= QUESTIONS.length; n++) {
+    var sel = document.querySelector('input[name="q' + n + '"]:checked');
+    if (sel) {
+      answered++;
+      var v = parseInt(sel.value, 10);
+      total += v;
+      detail.push({ n:n, score:v, label:sel.nextElementSibling.textContent });
+    } else {
+      detail.push({ n:n, score:null, label:"Not answered" });
+    }
+  }
+  return { total:total, answered:answered, detail:detail };
+}
+
+function bandFor(total) {
+  if (total >= 16) return { key:"high", name:"16–20 · Solid foundation",
+    title:"Most HR basics are in place.",
+    text:"Your foundations look sound. Close the remaining gaps before growth turns them into bottlenecks." };
+  if (total >= 10) return { key:"mid", name:"10–15 · Needs strengthening",
+    title:"Several practices need strengthening.",
+    text:"The basics exist but are uneven. Prioritise the areas below where you answered Partly or No." };
+  return { key:"low", name:"0–9 · Start with the essentials",
+    title:"Start with the essentials.",
+    text:"Begin by establishing clear HR responsibility and the core processes, then build steadily from there." };
+}
+
+function fillClass(pct){ return pct >= 80 ? "fill-high" : pct >= 50 ? "fill-mid" : "fill-low"; }
+function arcColour(pct){
+  return pct >= 80 ? getCss("--green") : pct >= 50 ? getCss("--amber") : getCss("--rust");
+}
+function getCss(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function refresh() {
+  var r = readAnswers();
+  barScore.textContent = r.total;
+  barAnswered.textContent = r.answered;
+  barBand.textContent = r.answered === QUESTIONS.length ? bandFor(r.total).name
+                                                        : "Your score updates as you answer";
+  r.detail.forEach(function (d) {
+    if (d.score !== null) document.getElementById("q" + d.n).classList.remove("missing");
+  });
+  return r;
+}
+document.getElementById("questions").addEventListener("change", refresh);
+
+/* ---------- Validation ---------- */
+var form = document.getElementById("hrForm"),
+    status = document.getElementById("status"),
+    dashStatus = document.getElementById("dashStatus"),
+    btn = document.getElementById("submitBtn");
+
+function showStatus(el, msg, ok) {
+  el.textContent = msg;
+  el.className = "status show " + (ok ? "ok" : "bad");
+}
+
+function validate(r) {
+  var problems = [];
+  ["company","nature","email"].forEach(function (id) {
+    var el = document.getElementById(id);
+    var bad = !el.value.trim() ||
+              (id === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim()));
+    el.classList.toggle("err", bad);
+    if (bad) problems.push(id);
+  });
+  var missing = r.detail.filter(function (d) { return d.score === null; });
+  missing.forEach(function (d) { document.getElementById("q" + d.n).classList.add("missing"); });
+
+  if (problems.length) {
+    showStatus(status, "Please complete the company name, nature of business and a valid email address.", false);
+    document.getElementById(problems[0]).focus();
+    return false;
+  }
+  if (missing.length) {
+    showStatus(status, "Please answer all ten questions — " + missing.length + " still to go.", false);
+    document.getElementById("q" + missing[0].n).scrollIntoView({ block:"center", behavior:"smooth" });
+    return false;
+  }
+  return true;
+}
+
+/* ---------- Dashboard ---------- */
+var CIRC = 2 * Math.PI * 88;
+
+function renderDashboard(r) {
+  var band = bandFor(r.total),
+      pct = Math.round(r.total / 20 * 100);
+
+  document.getElementById("dashDate").textContent = new Date().toLocaleDateString(undefined,
+    { day:"numeric", month:"long", year:"numeric" });
+
+  /* gauge */
+  var arc = document.getElementById("gaugeArc");
+  arc.style.stroke = arcColour(pct);
+  arc.style.strokeDasharray = CIRC;
+  arc.style.strokeDashoffset = CIRC;
+  document.getElementById("gaugeNum").textContent = r.total;
+
+  /* verdict */
+  var tag = document.getElementById("bandTag");
+  tag.className = "bandtag " + band.key;
+  tag.textContent = band.name;
+  document.getElementById("verdictTitle").textContent = band.title;
+  document.getElementById("verdictText").textContent = band.text;
+
+  /* meta strip */
+  var meta = [
+    ["Company", document.getElementById("company").value.trim()],
+    ["Nature of business", document.getElementById("nature").value.trim()],
+    ["Employees", document.getElementById("headcount").value || "Not given"],
+    ["Overall", pct + "%"]
+  ];
+  var ms = document.getElementById("metaStrip");
+  ms.innerHTML = "";
+  meta.forEach(function (m) {
+    var d = document.createElement("div");
+    var dt = document.createElement("dt"); dt.textContent = m[0];
+    var dd = document.createElement("dd"); dd.textContent = m[1];
+    d.appendChild(dt); d.appendChild(dd); ms.appendChild(d);
+  });
+
+  /* domain bars */
+  var dc = document.getElementById("domains");
+  dc.innerHTML = "";
+  var bars = [];
+  DOMAINS.forEach(function (dm) {
+    var got = 0, max = dm.qs.length * 2;
+    dm.qs.forEach(function (n) { got += r.detail[n - 1].score; });
+    var p = Math.round(got / max * 100);
+
+    var row = document.createElement("div"); row.className = "domain-row";
+    var line = document.createElement("div"); line.className = "domain-line";
+    var nm = document.createElement("span"); nm.className = "name"; nm.textContent = dm.name;
+    var vl = document.createElement("span"); vl.className = "val";
+    vl.textContent = got + " / " + max + "  ·  " + p + "%";
+    line.appendChild(nm); line.appendChild(vl);
+
+    var bar = document.createElement("div"); bar.className = "bar";
+    var fill = document.createElement("i"); fill.className = fillClass(p);
+    bar.appendChild(fill);
+
+    row.appendChild(line); row.appendChild(bar);
+    dc.appendChild(row);
+    bars.push({ el:fill, p:p });
+  });
+
+  /* question grid */
+  var qg = document.getElementById("qgrid");
+  qg.innerHTML = "";
+  r.detail.forEach(function (d) {
+    var cell = document.createElement("div"); cell.className = "qcell";
+    var dot = document.createElement("i"); dot.className = "dot s" + d.score;
+    var t = document.createElement("div"); t.className = "t";
+    var b = document.createElement("b"); b.textContent = d.n + ". " + SHORT[d.n - 1];
+    t.appendChild(b);
+    t.appendChild(document.createTextNode(d.label));
+    cell.appendChild(dot); cell.appendChild(t);
+    qg.appendChild(cell);
+  });
+
+  /* priority actions */
+  var wrap = document.getElementById("actionsWrap");
+  wrap.innerHTML = "";
+  var weak = r.detail.filter(function (d) { return d.score < 2; })
+                     .sort(function (a, b) { return a.score - b.score || a.n - b.n; });
+  if (!weak.length) {
+    var ok = document.createElement("div"); ok.className = "all-clear";
+    ok.textContent = "You answered Yes to all ten. Keep these practices documented and review them each year as the business changes.";
+    wrap.appendChild(ok);
+  } else {
+    var ol = document.createElement("ol"); ol.className = "actions-list";
+    weak.slice(0, 6).forEach(function (d) {
+      var li = document.createElement("li");
+      li.textContent = ACTIONS[d.n - 1];
+      ol.appendChild(li);
+    });
+    wrap.appendChild(ol);
+  }
+
+  /* reveal + animate */
+  form.style.display = "none";
+  document.getElementById("scorebar").style.display = "none";
+  document.getElementById("dashboard").classList.add("show");
+  window.scrollTo({ top:0, behavior:"smooth" });
+
+  requestAnimationFrame(function () {
+    setTimeout(function () {
+      arc.style.strokeDashoffset = CIRC * (1 - pct / 100);
+      bars.forEach(function (b) { b.el.style.width = b.p + "%"; });
+    }, 120);
+  });
+}
+
+/* ---------- Submit ---------- */
+function buildBody(r) {
+  var band = bandFor(r.total);
+  var lines = r.detail.map(function (d) {
+    return d.n + ". " + QUESTIONS[d.n - 1] + "\n     " + d.label + " (" + d.score + ")";
+  }).join("\n");
+  var dom = DOMAINS.map(function (dm) {
+    var got = 0, max = dm.qs.length * 2;
+    dm.qs.forEach(function (n) { got += r.detail[n - 1].score; });
+    return "  " + dm.name + ": " + got + "/" + max;
+  }).join("\n");
+
+  return "HR HEALTH CHECK — NEW SUBMISSION\n==================================\n\n" +
+    "Company:        " + document.getElementById("company").value.trim() + "\n" +
+    "Nature:         " + document.getElementById("nature").value.trim() + "\n" +
+    "Email:          " + document.getElementById("email").value.trim() + "\n" +
+    "Contact person: " + (document.getElementById("contact").value.trim() || "—") + "\n" +
+    "Phone:          " + (document.getElementById("phone").value.trim() || "—") + "\n" +
+    "Employees:      " + (document.getElementById("headcount").value || "—") + "\n\n" +
+    "TOTAL SCORE:    " + r.total + " / 20  (" + Math.round(r.total / 20 * 100) + "%)\n" +
+    "BAND:           " + band.name + "\n\n" +
+    "BY AREA\n-------\n" + dom + "\n\n" +
+    "RESPONSES\n---------\n" + lines + "\n\n" +
+    "Biggest people challenge:\n" +
+    (document.getElementById("challenge").value.trim() || "—") + "\n\n" +
+    "Wants a diagnostic discussion: " +
+    document.querySelector('input[name="diagnostic"]:checked').value + "\n\n" +
+    "Submitted: " + new Date().toLocaleString() + "\n";
+}
+
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+  var r = refresh();
+  if (!validate(r)) return;
+
+  status.className = "status";
+  renderDashboard(r);
+
+  if (!CONFIG.ENDPOINT) {
+    console.warn("HR Health Check: CONFIG.ENDPOINT is empty — nothing was emailed.");
+    return;
+  }
+
+  var data = {
+    subject: "HR Health Check — " + document.getElementById("company").value.trim() +
+             " (" + r.total + "/20)",
+    message: buildBody(r),
+    company: document.getElementById("company").value.trim(),
+    nature_of_business: document.getElementById("nature").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    contact_person: document.getElementById("contact").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    employees: document.getElementById("headcount").value,
+    total_score: r.total + "/20",
+    band: bandFor(r.total).name,
+    challenge: document.getElementById("challenge").value.trim(),
+    diagnostic: document.querySelector('input[name="diagnostic"]:checked').value,
+    _replyto: document.getElementById("email").value.trim()
+  };
+  if (CONFIG.ACCESS_KEY) data.access_key = CONFIG.ACCESS_KEY;
+
+  fetch(CONFIG.ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type":"application/json", "Accept":"application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); })
+  .then(function () {
+    showStatus(dashStatus, "A copy of these results has been sent to our team. We'll be in touch shortly.", true);
+  })
+  .catch(function () {
+    showStatus(dashStatus, "Your results are shown above, but we couldn't send a copy to our team. Please forward them to " + CONFIG.EMAIL_TO + ".", false);
+  });
+});
+
+/* ---------- Start again ---------- */
+document.getElementById("restartBtn").addEventListener("click", function () {
+  form.reset();
+  form.style.display = "";
+  document.getElementById("scorebar").style.display = "";
+  document.getElementById("dashboard").classList.remove("show");
+  dashStatus.className = "status";
+  status.className = "status";
+  document.querySelectorAll("ol.questions li").forEach(function (li) { li.classList.remove("missing"); });
+  refresh();
+  window.scrollTo({ top:0, behavior:"smooth" });
+});
+
+refresh();
+</script>
+</body>
+</html>
