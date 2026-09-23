@@ -221,6 +221,11 @@ footer.site{border-top:1px solid var(--line);padding:22px 20px 26px;text-align:c
 .topbar-inner a:hover{color:var(--cyan)}
 .topbar-links{display:flex;gap:20px}
 
+.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{max-width:1180px;margin:0 auto;padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
+.nav .brand{display:flex;align-items:center;gap:11px;margin:0;color:inherit;letter-spacing:normal;text-decoration:none}
+.nav .brand img{height:34px;width:auto;display:block}
+.nav .brand-word{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:19px;color:var(--navy-ink);letter-spacing:.01em}
 .site-nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .nav-inner{max-width:1180px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
 .site-brand{display:flex;align-items:center;gap:11px;text-decoration:none}
@@ -233,6 +238,7 @@ footer.site{border-top:1px solid var(--line);padding:22px 20px 26px;text-align:c
 .nav-toggle{display:none;background:none;border:none;padding:6px;cursor:pointer}
 .nav-toggle span{display:block;width:22px;height:2px;background:var(--navy-ink);margin:5px 0}
 @media(max-width:900px){
+  .nav .wrap{padding-left:32px;padding-right:32px}
   .nav-links{position:fixed;inset:60px 0 0 0;background:#fff;flex-direction:column;align-items:flex-start;gap:0;padding:10px 20px 24px;
     transform:translateY(-8px);opacity:0;pointer-events:none;transition:.2s ease;border-top:1px solid var(--line)}
   .nav-links.open{transform:translateY(0);opacity:1;pointer-events:auto}
@@ -264,7 +270,7 @@ footer.site{border-top:1px solid var(--line);padding:22px 20px 26px;text-align:c
 .footer-full ul li{margin-bottom:11px}
 .footer-full ul a{font-size:13.5px;color:rgba(255,255,255,.68);text-decoration:none}
 .footer-full ul a:hover{color:var(--cyan)}
-.footer-social{display:flex;gap:10px;margin-top:18px}
+.footer-social{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .footer-social a{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;transition:.15s ease}
 .footer-social a:hover{background:var(--cyan);border-color:var(--cyan)}
 .footer-social svg{width:14px;height:14px}
@@ -272,6 +278,12 @@ footer.site{border-top:1px solid var(--line);padding:22px 20px 26px;text-align:c
 .footer-bottom-inner{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12.5px}
 .footer-bottom-inner a{color:rgba(255,255,255,.68);text-decoration:none;margin-left:18px}
 .footer-bottom-inner a:hover{color:var(--cyan)}
+@media (max-width:560px){
+  .footer-full{padding-top:52px}
+  .footer-full .footer-inner{grid-template-columns:1fr;padding-left:20px;padding-right:20px}
+  .footer-bottom-inner{padding-left:20px;padding-right:20px}
+  .footer-bottom-inner a{margin-left:0;margin-right:18px}
+}
 
 .hidden-field{
   position:absolute;
@@ -372,19 +384,21 @@ footer.site{border-top:1px solid var(--line);padding:22px 20px 26px;text-align:c
   </div>
 </div>
 
-<header class="site-nav">
-  <div class="nav-inner">
-    <a href="index.html" class="site-brand"><img src="assets/logo.png" alt="Team Mates logo"><span>Team Mates</span></a>
-    <nav class="nav-links" id="navLinks">
+<header class="nav">
+  <div class="wrap">
+    <a href="index.html" class="brand">
+      <img src="assets/logo.png" alt="Team Mates logo">
+      <span class="brand-word">Team Mates</span>
+    </a>
+    <nav class="nav-links">
       <a href="index.html">Home</a>
       <a href="about.html">About Us</a>
       <a href="services.html">Services</a>
-      <a href="hr-health-check.html" class="active">HR Health Check</a>
-      <a href="contact.html">Contact Us</a>
+      <a href="hr-health-check.html">HR Health Check</a>
     </nav>
     <div class="nav-cta">
-      <a href="contact.html" class="btn btn-primary">Book a Consultation</a>
-      <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <a href="contact.html" class="btn btn-primary">Contact Us</a>
+      <button class="nav-toggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </div>
 </header>
@@ -633,10 +647,13 @@ footer.site{border-top:1px solid var(--line);padding:22px 20px 26px;text-align:c
       <div class="footer-brand"><img src="assets/logo.png" alt="Team Mates logo"><span>Team Mates</span></div>
       <p>Team Mates provides HR consultancy and advisory services to help Pakistani organizations build structured, compliant and profitable management systems.</p>
       <div class="footer-social">
-        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 9h3V6h-3c-1.66 0-3 1.34-3 3v2H9v3h2v6h3v-6h3l1-3h-4v-2c0-.55.45-1 1-1z"/></svg></a>
-        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6.5 8.5v9M6.5 5.5v.01M11 17.5v-5.2c0-1.8 1.2-3.3 3-3.3s3 1.4 3 3.3v5.2M11 12.3v-3.8"/></svg></a>
-        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.2"/><circle cx="16.4" cy="7.6" r=".6" fill="currentColor" stroke="none"/></svg></a>
-        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M10.5 9.5l4 2.5-4 2.5z" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://www.facebook.com/Teammates.Pk/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 9h3V6h-3c-1.66 0-3 1.34-3 3v2H9v3h2v6h3v-6h3l1-3h-4v-2c0-.55.45-1 1-1z"/></svg></a>
+        <a href="https://www.linkedin.com/company/teammates-your-growth-partner/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6.5 8.5v9M6.5 5.5v.01M11 17.5v-5.2c0-1.8 1.2-3.3 3-3.3s3 1.4 3 3.3v5.2M11 12.3v-3.8"/></svg></a>
+        <a href="https://www.instagram.com/teammatespk/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.2"/><circle cx="16.4" cy="7.6" r=".6" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://www.youtube.com/@TeammatesPk" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M10.5 9.5l4 2.5-4 2.5z" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://www.threads.com/@teammatespk" target="_blank" rel="noopener noreferrer" aria-label="Threads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17.7 11.2c-.3-3.4-2.3-5.2-5.7-5.2-3.5 0-5.7 2-5.7 5.2 0 3.1 2.1 5.2 5.4 5.2 2.7 0 4.5-1.3 4.5-3.3 0-1.8-1.5-2.8-4.1-2.8-2.2 0-3.5.8-3.5 2.1 0 1.1 1 1.8 2.4 1.8 1.7 0 2.8-.9 2.8-2.4 0-2.5-1.8-4.2-4.7-4.2"/></svg></a>
+        <a href="https://x.com/TeammatesPk" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 5l14 14M19 5L5 19"/></svg></a>
+        <a href="https://www.tiktok.com/@teammatespk" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 5v9.2a3.8 3.8 0 1 1-3-3.7M14 5c.5 2 1.8 3.2 4 3.5"/></svg></a>
       </div>
     </div>
     <div>
@@ -678,14 +695,6 @@ footer.site{border-top:1px solid var(--line);padding:22px 20px 26px;text-align:c
     </div>
   </div>
 </footer>
-
-<script>
-document.getElementById('navToggle').addEventListener('click', function(){
-  var links = document.getElementById('navLinks');
-  var open = links.classList.toggle('open');
-  this.setAttribute('aria-expanded', open);
-});
-</script>
 
 <script>
 /* ==================================================================
@@ -839,9 +848,27 @@ var form = document.getElementById("hrForm"),
     dashStatus = document.getElementById("dashStatus"),
     btn = document.getElementById("submitBtn");
 
-function showStatus(el, msg, ok) {
-  el.textContent = msg;
-  el.className = "status show " + (ok ? "ok" : "bad");
+function showStatus(el, message, success) {
+  if (!el) return;
+
+  el.textContent = message;
+  el.className = "status " + (success ? "success" : "error");
+
+  /* Clear any previous timer attached to this message */
+  if (el._hideTimer) {
+    clearTimeout(el._hideTimer);
+    el._hideTimer = null;
+  }
+
+  /* Successful messages disappear after 3 seconds.
+     Error messages remain visible. */
+  if (success) {
+    el._hideTimer = setTimeout(function () {
+      el.className = "status";
+      el.textContent = "";
+      el._hideTimer = null;
+    }, 3000);
+  }
 }
 
 function validate(r) {
@@ -1104,7 +1131,7 @@ form.addEventListener("submit", async function(e) {
 
     showStatus(
       dashStatus,
-      "Your HR Health Check has been submitted successfully. Your results are shown below.",
+      "Your HR Health Check has been submitted successfully.",
       true
     );
 
