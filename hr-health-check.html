@@ -1025,7 +1025,7 @@ function renderDashboard(r) {
   });
 }
 
-/* ---------- Submit to Netlify Forms ---------- */
+/* ---------- Submit to Netlify Forms + HR Report ---------- */
 
 form.addEventListener("submit", async function(e) {
   e.preventDefault();
@@ -1045,10 +1045,10 @@ form.addEventListener("submit", async function(e) {
    * Update hidden Netlify fields one final time
    * before submission.
    */
-  r.detail.forEach(function(d){
+  r.detail.forEach(function(d) {
     var field = document.getElementById("netlify-q" + d.n);
 
-    if(field){
+    if (field) {
       field.value =
         QUESTIONS[d.n - 1] +
         " — " +
@@ -1059,22 +1059,77 @@ form.addEventListener("submit", async function(e) {
     }
   });
 
-  var diagnostic = document.querySelector(
-    'input[name="diagnostic"]:checked'
-  );
+  /*
+   * Build the complete data package for the
+   * HR Health Check PDF report.
+   */
+  var reportData = {
+    company: document.getElementById("company").value.trim(),
 
-  if(diagnostic){
-    /*
-     * Netlify already sees this field because it exists
-     * directly in the HTML.
-     */
-  }
+    nature: document.getElementById("nature").value.trim(),
 
-  var formData = new FormData(form);
+    email: document.getElementById("email").value.trim(),
+
+    contact: document.getElementById("contact").value.trim(),
+
+    phone: document.getElementById("phone").value.trim(),
+
+    headcount: document.getElementById("headcount").value,
+
+    challenge: document.getElementById("challenge").value.trim(),
+
+    diagnostic: (
+      document.querySelector(
+        'input[name="diagnostic"]:checked'
+      ) || {}
+    ).value || "",
+
+    assessmentDate: new Date().toISOString(),
+
+    total: r.total,
+
+    percentage: Math.round(
+      r.total / 20 * 100
+    ),
+
+    details: r.detail.map(function(d) {
+      return {
+        n: d.n,
+        question: QUESTIONS[d.n - 1],
+        short: SHORT[d.n - 1],
+        score: d.score
+      };
+    }),
+
+    domains: DOMAINS.map(function(dm) {
+      var got = 0;
+
+      dm.qs.forEach(function(n) {
+        got += r.detail[n - 1].score;
+      });
+
+      return {
+        name: dm.name,
+        got: got,
+        max: dm.qs.length * 2
+      };
+    }),
+
+    actions: ACTIONS.map(function(action, index) {
+      return {
+        n: index + 1,
+        action: action
+      };
+    })
+  };
 
   /*
-   * Add useful calculated information to the submission.
+   * Existing Netlify Forms submission.
+   * We are preserving this exactly so the
+   * current working submission continues.
    */
+  var formData = new FormData(form);
+
   formData.append(
     "total_score",
     r.total + " / 20"
@@ -1090,18 +1145,18 @@ form.addEventListener("submit", async function(e) {
     bandFor(r.total).name
   );
 
-    formData.append(
+  formData.append(
     "submitted_at",
     new Date().toLocaleString()
   );
 
   formData.append(
     "domain_summary",
-    DOMAINS.map(function(dm){
+    DOMAINS.map(function(dm) {
       var got = 0;
       var max = dm.qs.length * 2;
 
-      dm.qs.forEach(function(n){
+      dm.qs.forEach(function(n) {
         got += r.detail[n - 1].score;
       });
 
@@ -1111,21 +1166,88 @@ form.addEventListener("submit", async function(e) {
 
   try {
 
-    var response = await fetch("/", {
+    /*
+     * --------------------------------------------------
+     * STEP 1
+     * Submit the existing Netlify Form.
+     * --------------------------------------------------
+     */
+    var netlifyResponse = await fetch("/", {
       method: "POST",
+
       headers: {
         "Content-Type":
           "application/x-www-form-urlencoded"
       },
-      body: new URLSearchParams(formData).toString()
+
+      body:
+        new URLSearchParams(formData).toString()
     });
 
-    if(!response.ok){
-      throw new Error("Submission failed");
+    if (!netlifyResponse.ok) {
+      throw new Error(
+        "Netlify form submission failed."
+      );
     }
 
     /*
-     * Show the dashboard immediately.
+     * --------------------------------------------------
+     * STEP 2
+     * Send the same real answers to our
+     * HR Health Report Netlify Function.
+     * --------------------------------------------------
+     */
+    submitBtn.textContent =
+      "Generating your report...";
+
+    console.log(
+  "BROWSER: Calling generate-health-report..."
+);
+
+    var reportResponse = await fetch(
+      "/.netlify/functions/generate-health-report",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(reportData)
+      }
+    );
+
+    console.log(
+  "BROWSER: Report function response:",
+  reportResponse.status
+);
+
+    if (!reportResponse.ok) {
+      var reportError = "";
+
+      try {
+        var errorData =
+          await reportResponse.json();
+
+        reportError =
+          errorData.error || "";
+      } catch (ignore) {
+        /* Ignore JSON parsing failure */
+      }
+
+      throw new Error(
+        reportError ||
+        "HR report generation failed."
+      );
+    }
+
+    /*
+     * --------------------------------------------------
+     * STEP 3
+     * Show the existing dashboard.
+     *
+     * We do NOT display or download the PDF.
+     * --------------------------------------------------
      */
     renderDashboard(r);
 
@@ -1135,30 +1257,33 @@ form.addEventListener("submit", async function(e) {
       true
     );
 
-  } catch(error) {
+  } catch (error) {
 
-    console.error(error);
+    console.error(
+      "HR Health Check submission error:",
+      error
+    );
 
     /*
-     * Even if submission fails, don't hide the user's
-     * results. They can still see their dashboard.
+     * Preserve the existing behavior:
+     * the user still sees their results.
      */
     renderDashboard(r);
 
     showStatus(
       dashStatus,
-      "Your results are ready, but we couldn't submit a copy to our team. Please email us directly at info@teammates.com.pk.",
+      "Your results are ready, but we could not complete the report submission. Please email us directly at info@teammates.com.pk.",
       false
     );
 
   } finally {
 
     submitBtn.disabled = false;
-    submitBtn.textContent = "See my results";
 
+    submitBtn.textContent =
+      "See my results";
   }
 });
-
 /* ---------- Start again ---------- */
 document.getElementById("restartBtn").addEventListener("click", function () {
   form.reset();

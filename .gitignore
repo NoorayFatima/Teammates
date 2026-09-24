@@ -1,0 +1,13 @@
+node_modules/
+.netlify/
+
+.env
+.env.*
+!.env.example
+
+test-health-report.pdf
+
+deno.lock
+
+.DS_Store
+Thumbs.db
